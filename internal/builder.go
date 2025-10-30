@@ -20,7 +20,26 @@ func ExecuteLLMCall[T any](
 	config *genai.GenerateContentConfig,
 	output *T,
 ) error {
-	fmt.Println("executing the llm call")
+	fmt.Println("=== LLM REQUEST CONTENT ===")
+	fmt.Printf("Model: %s\n", model)
+
+	// Print content with better formatting
+	for i, c := range content {
+		fmt.Printf("Content [%d]:\n", i)
+		for j, part := range c.Parts {
+			if part.Text != "" {
+				fmt.Printf("  Part [%d] (Text):\n", j)
+				fmt.Printf("    %s\n", part.Text)
+			}
+		}
+	}
+
+	// Print config as JSON for better readability
+	if config != nil {
+		configJSON, _ := json.MarshalIndent(config, "  ", "  ")
+		fmt.Printf("Generation Config:\n  %s\n", string(configJSON))
+	}
+	fmt.Println("===========================")
 	resp, err := generateContent(ctx, model, content, config)
 	if err != nil {
 		return fmt.Errorf("❌ error generating structured relation response: %w", err)
@@ -30,6 +49,9 @@ func ExecuteLLMCall[T any](
 	}
 	part := resp.Candidates[0].Content.Parts[0]
 	raw := strings.TrimSpace(part.Text)
+
+	fmt.Println("Raw Response")
+	fmt.Println(raw)
 	if err := json.Unmarshal([]byte(raw), output); err != nil {
 		return fmt.Errorf("❌ failed to unmarshal model output: %w\nRaw output: %s", err, raw)
 	}
