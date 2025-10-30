@@ -34,4 +34,5 @@ func NewGenAIStructBuilder(llm *genai.Client) GenAIStructBuilderInterface {
 	return &GenAIStructBuilder{
 		llm: llm,
 	}
+
 }
