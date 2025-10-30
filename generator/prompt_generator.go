@@ -15,7 +15,7 @@ type PromptGenerator[T any] struct {
 	Schema              []byte
 }
 
-func (g *PromptGenerator[T]) Execute(ctx context.Context, generateContent internal.GenerateContentFunc, model string, output *T) error {
+func (g PromptGenerator[T]) Execute(ctx context.Context, generateContent internal.GenerateContentFunc, model string, output *T) error {
 	schema, err := internal.BuildSchemaFromJson(g.Schema)
 	if err != nil {
 		return err
