@@ -11,13 +11,29 @@ import (
 
 const ResponseMIMEType = "application/json"
 
+type PromptExample[T any] struct {
+	Prompt   string `json:"prompt"`
+	Response T      `json:"response"`
+}
+
+func _appendExamples[T any](parts *[]*genai.Part, examples []PromptExample[T]) {
+	for _, example := range examples {
+		exValue := example.Response
+		exampleJSON, _ := json.MarshalIndent(exValue, "", "  ")
+
+		*parts = append(*parts, &genai.Part{
+			Text: fmt.Sprintf("Example prompt: %s\nExpected JSON: %s", example.Prompt, exampleJSON),
+		})
+	}
+}
 func _generate[T any](
 	ctx context.Context,
 	llm *genai.Client,
 	model string,
 	prompt string,
 	instructions string,
-	examples map[string]T,
+	examples []PromptExample[T],
+	categorizedExamples map[string][]PromptExample[T],
 	schema *genai.Schema,
 	output *T,
 ) error {
@@ -33,11 +49,13 @@ func _generate[T any](
 		Temperature:       float32Ptr(0.2),
 	}
 	parts := []*genai.Part{{Text: prompt}}
-	for exPrompt, exValue := range examples {
-		exampleJSON, _ := json.MarshalIndent(exValue, "", "  ")
+
+	_appendExamples(&parts, examples)
+	for category, exampleSlice := range categorizedExamples {
 		parts = append(parts, &genai.Part{
-			Text: fmt.Sprintf("Example prompt: %s\nExpected JSON: %s", exPrompt, exampleJSON),
+			Text: fmt.Sprintf("\n--- Categorized Example Group For Category :%d ---\n", category),
 		})
+		_appendExamples(&parts, exampleSlice)
 	}
 
 	content := []*genai.Content{{Parts: parts}}
@@ -66,7 +84,8 @@ func GenerateFromSchemaGeneric[T any](
 	model string,
 	prompt string,
 	instructions string,
-	examples map[string]T,
+	examples []PromptExample[T],
+	categorizedExamples map[string][]PromptExample[T],
 	schemaJSON []byte,
 	output *T,
 ) error {
@@ -74,7 +93,7 @@ func GenerateFromSchemaGeneric[T any](
 	if err := json.Unmarshal(schemaJSON, &parsedSchema); err != nil {
 		return fmt.Errorf("❌ failed to parse schema JSON: %w", err)
 	}
-	return _generate(ctx, llm, model, prompt, instructions, examples, &parsedSchema, output)
+	return _generate(ctx, llm, model, prompt, instructions, examples, categorizedExamples, &parsedSchema, output)
 }
 func GenerateFromStructGeneric[T any](
 	ctx context.Context,
@@ -82,9 +101,10 @@ func GenerateFromStructGeneric[T any](
 	model string,
 	prompt string,
 	instructions string,
-	examples map[string]T,
+	examples []PromptExample[T],
+	categorizedExamples map[string][]PromptExample[T],
 	output *T,
 ) error {
 	schema := BuildSchema(output)
-	return _generate(ctx, llm, model, prompt, instructions, examples, schema, output)
+	return _generate(ctx, llm, model, prompt, instructions, examples, categorizedExamples, schema, output)
 }

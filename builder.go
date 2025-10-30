@@ -16,7 +16,8 @@ type GenAIStructBuilderInterface interface {
 		model string,
 		prompt string,
 		instructions string,
-		examples map[string]map[string]interface{},
+		examples []PromptExample[map[string]interface{}],
+		categorizedExamples map[string][]PromptExample[map[string]interface{}],
 		schemaJSON []byte,
 		output *map[string]interface{},
 	) error
@@ -25,7 +26,8 @@ type GenAIStructBuilderInterface interface {
 		model string,
 		prompt string,
 		instructions string,
-		examples map[string]map[string]interface{},
+		examples []PromptExample[map[string]interface{}],
+		categorizedExamples map[string][]PromptExample[map[string]interface{}],
 		output *map[string]interface{},
 	) error
 }
