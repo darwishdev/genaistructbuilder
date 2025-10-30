@@ -20,6 +20,7 @@ func ExecuteLLMCall[T any](
 	config *genai.GenerateContentConfig,
 	output *T,
 ) error {
+	fmt.Println("executing the llm call")
 	resp, err := generateContent(ctx, model, content, config)
 	if err != nil {
 		return fmt.Errorf("❌ error generating structured relation response: %w", err)
@@ -32,6 +33,8 @@ func ExecuteLLMCall[T any](
 	if err := json.Unmarshal([]byte(raw), output); err != nil {
 		return fmt.Errorf("❌ failed to unmarshal model output: %w\nRaw output: %s", err, raw)
 	}
+	fmt.Println("Raw Response")
+	fmt.Println(raw)
 	return nil
 }
 func _appendRelationExamples[T any](parts *[]*genai.Part, examples []genaistructbuilder.RelationExample[T]) {
