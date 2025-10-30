@@ -84,6 +84,7 @@ func GenerateConfig(
 	ctx context.Context,
 	instructions string,
 	schema *genai.Schema,
+	temprature float32,
 ) *genai.GenerateContentConfig {
 	instructionsContent := &genai.Content{
 		Parts: []*genai.Part{{Text: instructions}},
@@ -92,7 +93,7 @@ func GenerateConfig(
 		SystemInstruction: instructionsContent,
 		ResponseMIMEType:  ResponseMIMEType,
 		ResponseSchema:    schema,
-		Temperature:       float32Ptr(0.2),
+		Temperature:       float32Ptr(temprature),
 	}
 	return config
 }

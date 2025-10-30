@@ -15,6 +15,7 @@ type PromptGenerator[T any] struct {
 	Instructions        string
 	Examples            []genaistructbuilder.PromptExample[T]
 	CategorizedExamples map[string][]genaistructbuilder.PromptExample[T]
+	Temperature         float32
 	Schema              []byte
 }
 
@@ -35,7 +36,7 @@ func (g PromptGenerator[T]) Execute(ctx context.Context, generateContent genaist
 	fmt.Println("✅ Schema built successfully")
 
 	// Generate config
-	config := internal.GenerateConfig(ctx, g.Instructions, schema)
+	config := internal.GenerateConfig(ctx, g.Instructions, schema, g.Temperature)
 	fmt.Printf("⚙️  Config generated - Temperature: %v\n", config.Temperature)
 
 	// Build the actual prompt that includes user input
@@ -64,21 +65,7 @@ func (g PromptGenerator[T]) Execute(ctx context.Context, generateContent genaist
 
 // Helper method to build the complete prompt including user input
 func (g PromptGenerator[T]) buildFullPrompt() string {
-	// This is where you combine instructions, schema, rules, AND the actual user prompt
-	// The structure depends on how your PromptGenerator is set up
-
-	// If g.Prompt already contains the full instructions + user input, use it as is
-	if strings.Contains(g.Prompt, "hiring sr sw eng ai ml exp worked @ google meta openai") {
-		return g.Prompt
-	}
-
-	// Otherwise, you need to structure it properly. Example:
 	builder := strings.Builder{}
-
-	// Add instructions/schema if they're separate from g.Prompt
-	// builder.WriteString("Your instructions here...\n\n")
-
-	// Add the actual user prompt that should be processed
 	builder.WriteString(g.Prompt)
 	builder.WriteString("\n\nPlease extract the structured data from the above prompt.")
 

@@ -13,6 +13,7 @@ type FileRelationGenerator[T any] struct {
 	RelationEntity      string
 	RelationContext     string
 	RelationRecordFile  []byte
+	temperature         float32
 	FileMIMEType        string
 	Instructions        string
 	Examples            []genaistructbuilder.RelationExample[T]
@@ -25,7 +26,7 @@ func (g *FileRelationGenerator[T]) Execute(ctx context.Context, generateContent 
 	if err != nil {
 		return err
 	}
-	config := internal.GenerateConfig(ctx, g.Instructions, genSchema)
+	config := internal.GenerateConfig(ctx, g.Instructions, genSchema, g.temperature)
 	processedText, mediaPart, err := internal.FileAdapter(ctx, g.RelationRecordFile, g.FileMIMEType)
 	if err != nil {
 		return fmt.Errorf("❌ file adapter failed: %w", err)
