@@ -45,6 +45,9 @@ func (g PromptGenerator[T]) Execute(ctx context.Context, generateContent genaist
 	parts := []*genai.Part{{Text: fullPrompt}}
 	fmt.Printf("🔢 Parts created: %d\n", len(parts))
 
+	// Add examples
+	internal.ExamplesHandler(parts, g.Examples, g.CategorizedExamples)
+
 	content := []*genai.Content{{Parts: parts}}
 	fmt.Printf("📦 Content blocks: %d\n", len(content))
 
