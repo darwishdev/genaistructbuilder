@@ -1,6 +1,8 @@
-package genaistructbuilder
+package internal
 
 import (
+	"context"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -80,3 +82,26 @@ func baseType(t reflect.Type) reflect.Type {
 	return t
 }
 func float32Ptr(v float32) *float32 { return &v }
+func FileAdapter(
+	ctx context.Context,
+	fileContent []byte,
+	mimeType string,
+) (textPart string, mediaPart *genai.Part, err error) {
+	if strings.HasPrefix(mimeType, "text/") ||
+		mimeType == "application/json" ||
+		mimeType == "application/xml" {
+		return string(fileContent), nil, nil
+	}
+	if strings.HasPrefix(mimeType, "image/") ||
+		mimeType == "application/pdf" {
+		return "", &genai.Part{
+			InlineData: &genai.Blob{
+				Data:     fileContent,
+				MIMEType: mimeType,
+			},
+		}, nil
+	}
+
+	// --- Case 3: Unhandled MIME Type ---
+	return "", nil, fmt.Errorf("unsupported file MIME type for adapter: %s", mimeType)
+}

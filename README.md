@@ -64,7 +64,7 @@ This is useful when you have the schema as a string or a file.
 ```go
 // ... inside main or a function with `builder` and `client`
 
-func ExampleGenerateFromSchema(ctx context.Context, builder genaistructbuilder.GenAIStructBuilderInterface, client *genai.Client) {
+func ExampleGenerateFromSchema(ctx context.Context, builder genaistructbuilder.GenAIStructBuilderInterface, client LLMClient) {
     const model = "gemini-2.5-flash"
     const prompt = "Please create a detailed product specification for a new smart toothbrush that uses AI."
     const instructions = "You are a Product Specification Generator. Your only job is to generate a JSON object."
@@ -143,7 +143,7 @@ type Feature struct {
     Description string `json:"description"`
 }
 
-func ExampleGenerateFromStruct(ctx context.Context, client *genai.Client) {
+func ExampleGenerateFromStruct(ctx context.Context, client LLMClient) {
     const model = "gemini-2.5-flash"
     const prompt = "Create a specification for a high-end, AI-powered electric toothbrush."
     const instructions = "You must strictly output a JSON object that matches the provided Go struct definition."
