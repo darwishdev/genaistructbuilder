@@ -18,7 +18,6 @@ type GenAIStructBuilder struct {
 type GenAIStructBuilderInterface interface {
 	GenerateFromchema(
 		ctx context.Context,
-		llm *genai.Client,
 		model string,
 		prompt string,
 		instructions string,
@@ -62,8 +61,6 @@ func _generate[T any](
 		ResponseSchema:    schema,
 		Temperature:       float32Ptr(0.2),
 	}
-
-	// You could optionally append example prompts and responses for few-shot learning
 	parts := []*genai.Part{{Text: prompt}}
 	for exPrompt, exValue := range examples {
 		exampleJSON, _ := json.MarshalIndent(exValue, "", "  ")
@@ -110,7 +107,6 @@ func GenerateFromSchemaGeneric[T any](
 }
 func (b *GenAIStructBuilder) GenerateFromchema(
 	ctx context.Context,
-	llm *genai.Client,
 	model string,
 	prompt string,
 	instructions string,
