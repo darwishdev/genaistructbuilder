@@ -12,11 +12,15 @@ type PromptGenerator[T any] struct {
 	Instructions        string
 	Examples            []internal.PromptExample[T]
 	CategorizedExamples map[string][]internal.PromptExample[T]
-	Schema              *genai.Schema
+	Schema              []byte
 }
 
 func (g *PromptGenerator[T]) Execute(ctx context.Context, generateContent internal.GenerateContentFunc, model string, output *T) error {
-	config := internal.GenerateConfig(ctx, g.Instructions, g.Schema)
+	schema, err := internal.BuildSchemaFromJson(g.Schema)
+	if err != nil {
+		return err
+	}
+	config := internal.GenerateConfig(ctx, g.Instructions, schema)
 	parts := []*genai.Part{{Text: g.Prompt}}
 	internal.ExamplesHandler(parts, g.Examples, g.CategorizedExamples)
 	content := []*genai.Content{{Parts: parts}}

@@ -15,11 +15,16 @@ type RelationGenerator[T any] struct {
 	Instructions        string
 	Examples            []internal.RelationExample[T]
 	CategorizedExamples map[string][]internal.RelationExample[T]
-	Schema              *genai.Schema
+	Schema              []byte
 }
 
 func (g *RelationGenerator[T]) Execute(ctx context.Context, generateContent internal.GenerateContentFunc, model string, output *T) error {
-	config := internal.GenerateConfig(ctx, g.Instructions, g.Schema)
+
+	schema, err := internal.BuildSchemaFromJson(g.Schema)
+	if err != nil {
+		return err
+	}
+	config := internal.GenerateConfig(ctx, g.Instructions, schema)
 	mainPrompt := fmt.Sprintf(
 		"Task: Generate a %s record based on the provided input JSON.\nContext: %s\nInput JSON: %s",
 		g.RelationEntity,

@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -20,6 +21,14 @@ const (
 	TypeArray   Type = "ARRAY"
 )
 
+func BuildSchemaFromJson(v []byte) (*genai.Schema, error) {
+	var genSchema genai.Schema
+	err := json.Unmarshal(v, &genSchema)
+	if err != nil {
+		return nil, fmt.Errorf("❌ getting schema from json failed: %w", err)
+	}
+	return &genSchema, nil
+}
 func BuildSchema(v any) *genai.Schema {
 	t := reflect.TypeOf(v)
 	if t.Kind() == reflect.Pointer {
