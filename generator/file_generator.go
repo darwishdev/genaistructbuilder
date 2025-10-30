@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/darwishdev/genaistructbuilder"
 	"github.com/darwishdev/genaistructbuilder/internal"
 	genai "google.golang.org/genai"
 )
@@ -14,12 +15,12 @@ type FileRelationGenerator[T any] struct {
 	RelationRecordFile  []byte
 	FileMIMEType        string
 	Instructions        string
-	Examples            []internal.RelationExample[T]
-	CategorizedExamples map[string][]internal.RelationExample[T]
+	Examples            []genaistructbuilder.RelationExample[T]
+	CategorizedExamples map[string][]genaistructbuilder.RelationExample[T]
 	Schema              []byte
 }
 
-func (g *FileRelationGenerator[T]) Execute(ctx context.Context, generateContent internal.GenerateContentFunc, model string, output *T) error {
+func (g *FileRelationGenerator[T]) Execute(ctx context.Context, generateContent genaistructbuilder.GenerateContentFunc, model string, output *T) error {
 	genSchema, err := internal.BuildSchemaFromJson(g.Schema)
 	if err != nil {
 		return err

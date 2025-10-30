@@ -3,6 +3,7 @@ package generator
 import (
 	"context"
 
+	"github.com/darwishdev/genaistructbuilder"
 	"github.com/darwishdev/genaistructbuilder/internal"
 	genai "google.golang.org/genai"
 )
@@ -10,12 +11,12 @@ import (
 type PromptGenerator[T any] struct {
 	Prompt              string
 	Instructions        string
-	Examples            []internal.PromptExample[T]
-	CategorizedExamples map[string][]internal.PromptExample[T]
+	Examples            []genaistructbuilder.PromptExample[T]
+	CategorizedExamples map[string][]genaistructbuilder.PromptExample[T]
 	Schema              []byte
 }
 
-func (g PromptGenerator[T]) Execute(ctx context.Context, generateContent internal.GenerateContentFunc, model string, output *T) error {
+func (g PromptGenerator[T]) Execute(ctx context.Context, generateContent genaistructbuilder.GenerateContentFunc, model string, output *T) error {
 	schema, err := internal.BuildSchemaFromJson(g.Schema)
 	if err != nil {
 		return err

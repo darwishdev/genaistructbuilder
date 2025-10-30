@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/darwishdev/genaistructbuilder"
 	genai "google.golang.org/genai"
 )
 
@@ -13,7 +14,7 @@ const ResponseMIMEType = "application/json"
 
 func ExecuteLLMCall[T any](
 	ctx context.Context,
-	generateContent GenerateContentFunc,
+	generateContent genaistructbuilder.GenerateContentFunc,
 	model string,
 	content []*genai.Content,
 	config *genai.GenerateContentConfig,
@@ -33,7 +34,7 @@ func ExecuteLLMCall[T any](
 	}
 	return nil
 }
-func _appendRelationExamples[T any](parts *[]*genai.Part, examples []RelationExample[T]) {
+func _appendRelationExamples[T any](parts *[]*genai.Part, examples []genaistructbuilder.RelationExample[T]) {
 	for _, example := range examples {
 		exValue := example.Response
 		exampleJSON, _ := json.MarshalIndent(exValue, "", "  ")
@@ -43,7 +44,7 @@ func _appendRelationExamples[T any](parts *[]*genai.Part, examples []RelationExa
 		})
 	}
 }
-func _appendExamples[T any](parts *[]*genai.Part, examples []PromptExample[T]) {
+func _appendExamples[T any](parts *[]*genai.Part, examples []genaistructbuilder.PromptExample[T]) {
 	for _, example := range examples {
 		exValue := example.Response
 		exampleJSON, _ := json.MarshalIndent(exValue, "", "  ")
@@ -71,7 +72,7 @@ func GenerateConfig(
 	return config
 }
 
-func RelationExampleHandler[T any](parts []*genai.Part, examples []RelationExample[T], categorizedExamples map[string][]RelationExample[T]) {
+func RelationExampleHandler[T any](parts []*genai.Part, examples []genaistructbuilder.RelationExample[T], categorizedExamples map[string][]genaistructbuilder.RelationExample[T]) {
 	_appendRelationExamples(&parts, examples)
 	for category, exampleSlice := range categorizedExamples {
 		parts = append(parts, &genai.Part{
@@ -80,7 +81,7 @@ func RelationExampleHandler[T any](parts []*genai.Part, examples []RelationExamp
 		_appendRelationExamples(&parts, exampleSlice)
 	}
 }
-func ExamplesHandler[T any](parts []*genai.Part, examples []PromptExample[T], categorizedExamples map[string][]PromptExample[T]) {
+func ExamplesHandler[T any](parts []*genai.Part, examples []genaistructbuilder.PromptExample[T], categorizedExamples map[string][]genaistructbuilder.PromptExample[T]) {
 	_appendExamples(&parts, examples)
 	for category, exampleSlice := range categorizedExamples {
 		parts = append(parts, &genai.Part{
